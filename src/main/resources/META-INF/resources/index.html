@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marmot Dynamic Secrets Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="container">
+  <section class="hero">
+    <div class="card marmot">
+      <figure class="marmot-photo-wrap">
+        <img class="marmot-photo" src="/assets/marmot_v2.png" alt="Marmotte alpine" />
+      </figure>
+      <div class="status">
+        <h1 class="title">Dynamic Secrets</h1>
+        <p class="subtitle">La marmotte exécute du SQL sans connaître de mot de passe.</p>
+        <div class="status-chip"><span class="dot"></span><span id="connectionState">Connected</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Credentials Panel</h2>
+      <div class="kv"><span>Username</span><span class="code" id="username">-</span></div>
+      <div class="kv"><span>Role</span><span class="code" id="role">readonly</span></div>
+      <div class="kv"><span>Permissions</span><span class="code" id="permissions">SELECT only</span></div>
+<!--      <div class="kv"><span>TTL</span><span class="code" id="ttlText">--:--</span></div>-->
+      <div class="timer" id="timer">--:--</div>
+      <div class="meter"><div class="bar" id="ttlBar"></div></div>
+      <div class="punchline" id="punchline">Ce user n'existait pas il y a quelques secondes.</div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <h2>SQL Actions</h2>
+      <div class="actions">
+        <button id="btnUser">SELECT current_user</button>
+        <button id="btnCustomers">SELECT * FROM customers</button>
+        <button id="btnWrite">INSERT test (doit échouer)</button>
+      </div>
+      <pre class="output" id="sqlOutput">Prêt.</pre>
+    </article>
+
+    <article class="card">
+      <h2>DB Users</h2>
+      <ul class="user-list" id="usersList"></ul>
+      <pre class="output" id="usersOutput">Auto-refresh toutes les 1s.</pre>
+    </article>
+  </section>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

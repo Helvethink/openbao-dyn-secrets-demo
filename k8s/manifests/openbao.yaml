@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openbao-sa
+  namespace: marmot-demo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openbao-token-reviewer
+subjects:
+  - kind: ServiceAccount
+    name: openbao-sa
+    namespace: marmot-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openbao
+  namespace: marmot-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openbao
+  template:
+    metadata:
+      labels:
+        app: openbao
+    spec:
+      serviceAccountName: openbao-sa
+      containers:
+        - name: openbao
+          image: openbao/openbao:latest
+          args:
+            - server
+            - -dev
+            - -dev-root-token-id=ROOT_TOKEN
+            - -dev-listen-address=0.0.0.0:8200
+          ports:
+            - containerPort: 8200
+          env:
+            - name: BAO_ADDR
+              value: http://127.0.0.1:8200
+            - name: SKIP_CHOWN
+              value: "true"
+            - name: SKIP_SETCAP
+              value: "true"
+          readinessProbe:
+            tcpSocket:
+              port: 8200
+            initialDelaySeconds: 3
+            periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openbao
+  namespace: marmot-demo
+spec:
+  selector:
+    app: openbao
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openbao-nodeport
+  namespace: marmot-demo
+spec:
+  type: NodePort
+  selector:
+    app: openbao
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
+      nodePort: 30200
